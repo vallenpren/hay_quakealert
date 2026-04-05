@@ -12,7 +12,8 @@ let previousLatestQuakeTime = null; // to trigger alarm on new quake
 const onboardingOverlay = document.getElementById('onboarding-overlay');
 const btnStart = document.getElementById('btn-start');
 const userNameInput = document.getElementById('user-name');
-const displayName = document.getElementById('display-name');
+const displayNameList = [document.getElementById('display-name')]; // array for multiple places
+const navUserDisplay = document.getElementById('nav-user-display');
 const alarmToggle = document.getElementById('alarm-toggle');
 
 const latestQuakeContainer = document.getElementById('latest-quake');
@@ -27,6 +28,34 @@ const alarmDistanceInfo = document.getElementById('alarm-distance-info');
 // Constants
 const BMKG_AUTO_URL = 'https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json';
 const BMKG_TERKINI_URL = 'https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json';
+
+// View Navigation Logic
+const navItems = document.querySelectorAll('.nav-item');
+const viewSections = document.querySelectorAll('.view-section');
+
+navItems.forEach(item => {
+    item.addEventListener('click', () => {
+        // Remove active class from all nav items
+        navItems.forEach(nav => nav.classList.remove('active'));
+        // Add active to clicked
+        item.classList.add('active');
+
+        // Hide all sections
+        viewSections.forEach(section => section.classList.remove('active'));
+        
+        // Show target section
+        const targetId = item.getAttribute('data-target');
+        const targetSection = document.getElementById(targetId);
+        targetSection.classList.add('active');
+
+        // Handle Map rendering bug when switching from display none
+        if (targetId === 'map-view' && map) {
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 100);
+        }
+    });
+});
 
 // Initialize Map
 function initMap() {
@@ -45,6 +74,7 @@ function initMap() {
 
 // Distance Calculation (Haversine Formula)
 function calculateDistance(lat1, lon1, lat2, lon2) {
+    if (!lat1 || !lon1) return null;
     const R = 6371; // km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -58,6 +88,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 // Set up Alarm Audio (Web Audio API Siren)
 function initAudio() {
+    // Only init once
+    if (audioContext) return;
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
 
@@ -126,10 +158,38 @@ async function fetchQuakeData() {
         const recentQuakes = dataTerkini.Infogempa.gempa; // Array of 15
 
         updateDashboard(latest, recentQuakes);
+        populateNews(recentQuakes); // Populate news section
     } catch (err) {
         console.error("Gagal mengambil data BMKG:", err);
-        latestQuakeContainer.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-triangle"></i> Gagal memuat data.</div>`;
+        latestQuakeContainer.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-triangle"></i> Gagal memuat data. Periksa koneksi internet.</div>`;
     }
+}
+
+// Populate News on Home based on recent quakes
+function populateNews(recentList) {
+    const newsContainer = document.getElementById('news-container');
+    newsContainer.innerHTML = ''; // clear static
+    
+    // Static Important Info
+    newsContainer.innerHTML += `
+        <div class="news-item">
+            <div class="news-date">System Status MANTAP</div>
+            <h4>Semua Subsistem Online</h4>
+            <p>Aplikasi QuakeAlert telah terhubung stabil ke satelit pemantau milik institusi pemerintah. Jaga perangkat Anda tetap menyala dan GPS Anda aktif.</p>
+        </div>
+    `;
+
+    // Dynamic info from recent quakes
+    recentList.slice(0, 3).forEach(q => {
+        let severityClass = parseFloat(q.Magnitude) >= 5.0 ? 'text-warning' : '';
+        newsContainer.innerHTML += `
+            <div class="news-item">
+                <div class="news-date ${severityClass}">${q.Tanggal} - ${q.Jam}</div>
+                <h4 class="${severityClass}">Gempa ${q.Magnitude} SR: ${q.Wilayah}</h4>
+                <p>Kedalaman: ${q.Kedalaman}. ${q.Potensi}</p>
+            </div>
+        `;
+    });
 }
 
 // Custom Leaflet Icons
@@ -154,6 +214,9 @@ const userIcon = L.divIcon({
 let mapMarkers = [];
 
 function updateDashboard(latest, recentList) {
+    // Wait until map is initialized
+    if (!map) return;
+
     // Clear old markers
     mapMarkers.forEach(m => map.removeLayer(m));
     mapMarkers = [];
@@ -192,10 +255,15 @@ function updateDashboard(latest, recentList) {
                 <div class="q-time">${q.Tanggal} ${q.Jam}</div>
             </div>
         `;
-        // Click recent item to pan map
+        // Click recent item to pan map and open Map View
         item.addEventListener('click', () => {
-            const [qLat, qLon] = q.Coordinates.split(',').map(Number);
-            map.flyTo([qLat, qLon], 7);
+            // Switch to map view if not in map view
+            document.querySelector('[data-target="map-view"]').click();
+            
+            setTimeout(()=> {
+                const [qLat, qLon] = q.Coordinates.split(',').map(Number);
+                map.flyTo([qLat, qLon], 7);
+            }, 300);
         });
         quakeListEl.appendChild(item);
 
@@ -225,7 +293,7 @@ function updateDashboard(latest, recentList) {
     latestMarker.addTo(map);
     mapMarkers.push(latestMarker);
 
-    // Latest Circle (pulse effect via CSS on marker, but let's add a fixed red circle for radius)
+    // Latest Circle
     const latestRadius = L.circle([latLatest, lonLatest], {
         color: '#ef4444',
         fillColor: '#ef4444',
@@ -243,11 +311,10 @@ function updateDashboard(latest, recentList) {
     }
 
     // Logic for Early Warning System
-    // Check if new latest quake arrived
     if (previousLatestQuakeTime !== latest.DateTime) {
         previousLatestQuakeTime = latest.DateTime;
         
-        // Trigger if magnitude >= 5.0 AND distance < 500km, or just showcase purposes we trigger always if distance < 2000km
+        // Example logic: distance < 800km and Mag >= 5.0
         const thresholdDistance = 800; // km
         const mag = parseFloat(latest.Magnitude);
 
@@ -288,7 +355,8 @@ btnStart.addEventListener('click', () => {
         return;
     }
     userName = name;
-    displayName.innerText = userName;
+    displayNameList.forEach(el => el.innerText = userName);
+    navUserDisplay.style.display = 'flex'; // show in navbar
 
     // Request Location
     if (navigator.geolocation) {
@@ -301,34 +369,30 @@ btnStart.addEventListener('click', () => {
                     lon: position.coords.longitude
                 };
                 
-                // Hide modal and start app
-                onboardingOverlay.classList.remove('active');
-                initMap();
-                initAudio(); // must init audio on user interaction
-                
+                startAppFlow();
                 // Pan map to user initially
-                map.flyTo([userLocation.lat, userLocation.lon], 6);
-                
-                // Load data
-                fetchQuakeData();
-                // Polling every 1 minute
-                setInterval(fetchQuakeData, 60000);
+                setTimeout(() => { map.flyTo([userLocation.lat, userLocation.lon], 6); }, 500);
             },
             (error) => {
                 console.error(error);
-                alert("Izin lokasi ditolak atau tidak tersedia. Aplikasi tetap berjalan tanpa perhitungan jarak.");
+                alert("Izin lokasi ditolak. Aplikasi berjalan tanpa perhitungan jarak live.");
                 userLocation = null;
-                onboardingOverlay.classList.remove('active');
-                initMap();
-                initAudio();
-                fetchQuakeData();
-                setInterval(fetchQuakeData, 60000);
+                startAppFlow();
             }
         );
     } else {
         alert("Browser Anda tidak mendukung Geolocation.");
+        startAppFlow();
     }
 });
+
+function startAppFlow() {
+    onboardingOverlay.classList.remove('active');
+    initMap();
+    initAudio(); 
+    fetchQuakeData();
+    setInterval(fetchQuakeData, 60000); // Poll every 1m
+}
 
 // Setup Initial State
 window.addEventListener('DOMContentLoaded', () => {

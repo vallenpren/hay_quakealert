@@ -14,6 +14,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="glass-navbar">
+        <div class="nav-brand">
+            <i class="fa-solid fa-wave-square"></i> QuakeAlert
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item active" data-target="home-view"><i class="fa-solid fa-house"></i> Beranda</li>
+            <li class="nav-item" data-target="map-view"><i class="fa-solid fa-map-location-dot"></i> Peta Gempa</li>
+        </ul>
+        <div class="nav-user" id="nav-user-display" style="display: none;">
+            <i class="fa-solid fa-user-circle"></i> <span id="display-name">Pengguna</span>
+        </div>
+    </nav>
+
     <!-- Modal Welcome & Onboarding -->
     <div id="onboarding-overlay" class="overlay active">
         <div class="glass-modal">
@@ -37,73 +51,148 @@
         </div>
     </div>
 
-    <!-- Main App Container -->
+    <!-- Main Content -->
     <main class="app-container">
-        <!-- Map Container -->
-        <div id="map-container"></div>
         
-        <!-- UI Overlay -->
-        <div class="ui-overlay">
-            <!-- Header -->
-            <header class="glass-panel header-bar">
-                <div class="user-greeting">
-                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
-                    <div class="greeting-text">
-                        <span class="hello">Halo,</span>
-                        <span id="display-name" class="name">Pengguna</span>
+        <!-- ================= HOME VIEW ================= -->
+        <section id="home-view" class="view-section active">
+            <div class="container scrollable-content">
+                
+                <!-- Founder Section -->
+                <div class="founder-card glass-panel slide-in-top">
+                    <div class="founder-img-wrapper">
+                        <!-- Make sure to name your image 'founder.jpg' and put it in the same folder -->
+                        <img src="founder.jpg" alt="Vallent Aprilanicova Sienli" onerror="this.src='./founder.jpg'; this.onerror=function(){this.src='https://ui-avatars.com/api/?name=Vallent+Aprilanicova&background=3b82f6&color=fff&size=150'};">
                     </div>
-                </div>
-                <div class="app-title">
-                    <i class="fa-solid fa-wave-square"></i> QuakeAlert
-                </div>
-                <!-- Toggle Warning Settings -->
-                <div class="settings-toggle tooltip-container">
-                    <label class="switch">
-                        <input type="checkbox" id="alarm-toggle" checked>
-                        <span class="slider round"></span>
-                    </label>
-                    <span class="tooltip-text">Alarm Peringatan Aktif</span>
-                    <span class="toggle-label"><i class="fa-solid fa-bell"></i></span>
-                </div>
-            </header>
-
-            <!-- Status Dashboard -->
-            <div class="dashboard layout-row">
-                <!-- Latest Quake Info Panel -->
-                <div class="glass-panel info-panel slide-in-left">
-                    <h3><i class="fa-solid fa-bolt text-warning"></i> Gempa Terkini</h3>
-                    <div class="latest-quake-details" id="latest-quake">
-                        <div class="loading-pulse">Memuat data BMKG...</div>
-                    </div>
-                    <div class="status-indicator">
-                        <div class="pulse-dot active"></div>
-                        <span>Live Sync BMKG</span>
+                    <div class="founder-info">
+                        <h2>Vallent Aprilanicova Sienli</h2>
+                        <span class="founder-title">Founder & Lead Developer, QuakeAlert</span>
+                        <div class="founder-quote">
+                            <i class="fa-solid fa-quote-left"></i>
+                            <p>Sistem web ini dedikasikan agar masyarakat Indonesia terutama daerah rawan gempa dapat memperoleh peringatan dini secara cepat, akurat, dan mudah diakses. Keselamatan warga adalah tujuan utama pembuatan inovasi mitigasi bencana ini.</p>
+                            <i class="fa-solid fa-quote-right quote-right"></i>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Alert Stats -->
-                <div class="glass-panel stats-panel slide-in-top">
-                    <div class="stat-box">
-                        <div class="stat-value" id="quake-count">-</div>
-                        <div class="stat-label">Total Gempa (Terkini)</div>
+                <div class="home-grid">
+                    <!-- Edukasi Keselamatan -->
+                    <div class="glass-panel education-panel slide-in-left">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-person-running"></i> Panduan Keselamatan Gempa</h3>
+                        </div>
+                        <div class="edu-content">
+                            <div class="edu-card">
+                                <h4><i class="fa-solid fa-house-chimney"></i> Jika Berada di Dalam Ruangan</h4>
+                                <ul>
+                                    <li>Berlindung di bawah meja yang kuat.</li>
+                                    <li>Jauhi lemari, rak buku, dan lembaran kaca.</li>
+                                    <li>Lindungi kepala dengan bantal atau lengan.</li>
+                                </ul>
+                            </div>
+                            <div class="edu-card">
+                                <h4><i class="fa-solid fa-tree"></i> Jika Berada di Luar Ruangan</h4>
+                                <ul>
+                                    <li>Jauhi bangunan tinggi, tiang listrik, dan pohon.</li>
+                                    <li>Cari area lapangan terbuka.</li>
+                                    <li>Hindari tebing atau area rawan longsor.</li>
+                                </ul>
+                            </div>
+                            <div class="edu-card">
+                                <h4><i class="fa-solid fa-car"></i> Jika Sedang Berkendara</h4>
+                                <ul>
+                                    <li>Segera menepi di tempat yang aman dan lapang.</li>
+                                    <li>Jangan berhenti di bawah jembatan/pohon/tiang listrik.</li>
+                                    <li>Tetap di dalam mobil hingga guncangan mereda.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-box align-right">
-                        <div class="stat-value" id="user-distance">- km</div>
-                        <div class="stat-label">Jarak Pusat Gempa</div>
+
+                    <!-- Berita & Informasi -->
+                    <div class="glass-panel news-panel slide-in-bottom">
+                        <div class="panel-header">
+                            <h3><i class="fa-regular fa-newspaper"></i> Pusat Informasi & Info BMKG</h3>
+                        </div>
+                        <div class="news-list" id="news-container">
+                            <!-- Populated with recent big quakes as news or general static news -->
+                            <div class="news-item">
+                                <div class="news-date">Peringatan BMKG</div>
+                                <h4>Pastikan Tas Siaga Bencana Selalu Siap</h4>
+                                <p>Sediakan perlengkapan P3K, senter, makanan instan, dan dokumen penting dalam satu tas darurat yang mudah dibawa.</p>
+                            </div>
+                            <div class="news-item">
+                                <div class="news-date">Informasi Server</div>
+                                <h4>Live Streaming Data Gempa Terintegrasi</h4>
+                                <p>Seluruh data di QuakeAlert telah terenkripsi dan sinkronisasi real-time dengan server Badan Meteorologi, Klimatologi, dan Geofisika (BMKG).</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Recent Quakes List -->
-            <div class="glass-panel recent-quakes slide-in-bottom">
-                <h3><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Terakhir</h3>
-                <div class="quake-list" id="quake-list">
-                    <!-- Populated by JS -->
+        <!-- ================= MAP VIEW ================= -->
+        <section id="map-view" class="view-section">
+            <!-- Map Container -->
+            <div id="map-container"></div>
+            
+            <!-- UI Overlay -->
+            <div class="ui-overlay">
+                <!-- Header Overlay di Map -->
+                <div class="header-bar glass-panel mt">
+                    <div class="app-title-small">
+                        <i class="fa-solid fa-map-location-dot"></i> Peta Pantauan Real-Time
+                    </div>
+                    <!-- Toggle Warning Settings -->
+                    <div class="settings-toggle tooltip-container">
+                        <label class="switch">
+                            <input type="checkbox" id="alarm-toggle" checked>
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="tooltip-text">Alarm Peringatan Aktif</span>
+                        <span class="toggle-label"><i class="fa-solid fa-bell"></i></span>
+                    </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Alarm UI Trigger -->
+                <!-- Status Dashboard -->
+                <div class="dashboard layout-row">
+                    <!-- Latest Quake Info Panel -->
+                    <div class="glass-panel info-panel slide-in-left">
+                        <h3><i class="fa-solid fa-bolt text-warning"></i> Gempa Terkini</h3>
+                        <div class="latest-quake-details" id="latest-quake">
+                            <div class="loading-pulse">Memuat data BMKG...</div>
+                        </div>
+                        <div class="status-indicator">
+                            <div class="pulse-dot active"></div>
+                            <span>Live Sync BMKG</span>
+                        </div>
+                    </div>
+
+                    <!-- Alert Stats -->
+                    <div class="glass-panel stats-panel slide-in-top">
+                        <div class="stat-box">
+                            <div class="stat-value" id="quake-count">-</div>
+                            <div class="stat-label">Total Gempa (Terkini)</div>
+                        </div>
+                        <div class="stat-box align-right">
+                            <div class="stat-value" id="user-distance">- km</div>
+                            <div class="stat-label">Jarak Pusat Gempa</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Quakes List -->
+                <div class="glass-panel recent-quakes slide-in-bottom">
+                    <h3><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Terakhir</h3>
+                    <div class="quake-list" id="quake-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div> <!-- End UI Overlay -->
+        </section>
+
+        <!-- Alarm UI Trigger (Global) -->
         <div id="alarm-modal" class="overlay">
             <div class="alarm-content shake-animation">
                 <i class="fa-solid fa-triangle-exclamation warning-icon"></i>
