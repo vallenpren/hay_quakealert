@@ -54,7 +54,7 @@ navItems.forEach(item => {
 
         // Hide all sections
         viewSections.forEach(section => section.classList.remove('active'));
-        
+
         // Show target section
         const targetId = item.getAttribute('data-target');
         const targetSection = document.getElementById(targetId);
@@ -70,16 +70,16 @@ navItems.forEach(item => {
 });
 
 let baseLayerDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 20,
-        keepBuffer: 3 // Smooth panning
-    });
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 20,
+    keepBuffer: 3 // Smooth panning
+});
 
 let baseLayerSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri',
-        maxZoom: 20
-    });
+    attribution: 'Tiles &copy; Esri',
+    maxZoom: 20
+});
 
 // Initialize Map
 function initMap() {
@@ -100,8 +100,8 @@ function calculateBearing(lat1, lon1, lat2, lon2) {
     const dLon = toRad(lon2 - lon1);
     const y = Math.sin(dLon) * Math.cos(toRad(lat2));
     const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
-            Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
-    
+        Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
+
     let brng = toDeg(Math.atan2(y, x));
     return (brng + 360) % 360;
 }
@@ -112,11 +112,11 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return Math.round(R * c);
 }
 
@@ -160,7 +160,7 @@ function playAlarm() {
     gainNode.connect(audioContext.destination);
 
     gainNode.gain.value = 0.5; // Volume
-    
+
     osc1.start();
     osc2.start();
     lfo.start();
@@ -203,7 +203,7 @@ async function fetchQuakeData() {
 function populateNews(recentList) {
     const newsContainer = document.getElementById('news-container');
     newsContainer.innerHTML = ''; // clear static
-    
+
     // Static Important Info
     newsContainer.innerHTML += `
         <div class="news-item">
@@ -258,24 +258,24 @@ function updateDashboard(latest, recentList) {
     // Parse latest coordinates
     const [latLatest, lonLatest] = latest.Coordinates.split(',').map(Number);
     const magLatest = parseFloat(latest.Magnitude);
-    
+
     // Check for distance if user location is available
     let distanceToUser = null;
     let bearingToQuake = null;
     if (userLocation) {
         distanceToUser = calculateDistance(userLocation.lat, userLocation.lon, latLatest, lonLatest);
         userDistanceEl.innerText = `${distanceToUser} km`;
-        
+
         // Tactical Compass Logic
         bearingToQuake = calculateBearing(userLocation.lat, userLocation.lon, latLatest, lonLatest);
         // We point AWAY from the quake (180 deg opposite) for Evacuation Direction
         let evacuationBearing = (bearingToQuake + 180) % 360;
-        
+
         // CSS expects rotation from Top. The icon fa-location-arrow points top-right (45deg).
         // Correcting: fa-location-arrow default points Top-Right (45 deg). We need it to point to evacuationBearing.
         // So applied rotation = evacuationBearing - 45.
         evacuationCompass.style.transform = `rotate(${Math.round(evacuationBearing - 45)}deg)`;
-        
+
         // Tactical Risk Assessment
         riskStatus.className = 'risk-level'; // reset
         if (distanceToUser < 150 && magLatest >= 5.0) {
@@ -329,8 +329,8 @@ function updateDashboard(latest, recentList) {
         item.addEventListener('click', () => {
             // Switch to map view if not in map view
             document.querySelector('[data-target="map-view"]').click();
-            
-            setTimeout(()=> {
+
+            setTimeout(() => {
                 const [qLat, qLon] = q.Coordinates.split(',').map(Number);
                 map.flyTo([qLat, qLon], 7);
             }, 300);
@@ -345,7 +345,7 @@ function updateDashboard(latest, recentList) {
                 .bindPopup(`<b>${q.Magnitude} SR</b><br>${q.Wilayah}<br>${q.Tanggal} ${q.Jam}`);
             marker.addTo(map);
             mapMarkers.push(marker);
-            
+
             // Add magnitude circle
             const circle = L.circle([qlat, qlon], {
                 color: '#f59e0b',
@@ -372,12 +372,12 @@ function updateDashboard(latest, recentList) {
         radius: parseFloat(latest.Magnitude) * 20000
     }).addTo(map);
     mapMarkers.push(latestRadius);
-    
+
     // Add immersive radar sweep layer
     const radarSweep = L.divIcon({
         className: '',
-        html: `<div class="radar-sweep" style="width:${parseFloat(latest.Magnitude)*15}px; height:${parseFloat(latest.Magnitude)*15}px;"></div>`,
-        iconSize: [parseFloat(latest.Magnitude)*15, parseFloat(latest.Magnitude)*15]
+        html: `<div class="radar-sweep" style="width:${parseFloat(latest.Magnitude) * 15}px; height:${parseFloat(latest.Magnitude) * 15}px;"></div>`,
+        iconSize: [parseFloat(latest.Magnitude) * 15, parseFloat(latest.Magnitude) * 15]
     });
     const radarMarker = L.marker([latLatest, lonLatest], { icon: radarSweep, zIndexOffset: 999 }).addTo(map);
     mapMarkers.push(radarMarker);
@@ -393,7 +393,7 @@ function updateDashboard(latest, recentList) {
     // Logic for Early Warning System
     if (previousLatestQuakeTime !== latest.DateTime) {
         previousLatestQuakeTime = latest.DateTime;
-        
+
         // Example logic: distance < 800km and Mag >= 5.0
         const thresholdDistance = 800; // km
         const mag = parseFloat(latest.Magnitude);
@@ -430,11 +430,11 @@ if (btnExportCsv) {
         cachedQuakeList.forEach(q => {
             const [qLat, qLon] = q.Coordinates.split(',').map(Number);
             const mag = parseFloat(q.Magnitude);
-            
+
             let dist = "N/A";
             let evaBear = "N/A";
             let resiko = "AMAN";
-            
+
             if (userLocation) {
                 dist = calculateDistance(userLocation.lat, userLocation.lon, qLat, qLon);
                 let bearing = calculateBearing(userLocation.lat, userLocation.lon, qLat, qLon);
@@ -443,7 +443,7 @@ if (btnExportCsv) {
                 if (dist < 150 && mag >= 5.0) resiko = "BAHAYA";
                 else if (dist < 500 && mag >= 4.0) resiko = "WASPADA";
             }
-            
+
             // Clean text for CSV (removing commas to prevent delimiter issues)
             let wilayahClean = `"${q.Wilayah.replace(/"/g, '""')}"`;
             let potensiClean = `"${q.Potensi ? q.Potensi.replace(/"/g, '""') : 'Tidak'}"`;
@@ -457,7 +457,7 @@ if (btnExportCsv) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.setAttribute("href", url);
-        link.setAttribute("download", `Analisis_Spasial_QuakeAlert_${new Date().toISOString().slice(0,10)}.csv`);
+        link.setAttribute("download", `Analisis_Spasial_QuakeAlert_${new Date().toISOString().slice(0, 10)}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -521,12 +521,12 @@ btnStart.addEventListener('click', () => {
     sessionStorage.setItem(SESSION_NAME, userName);
 
     displayNameList.forEach(el => el.innerText = userName);
-    if(nUserDisplay) nUserDisplay.style.display = 'flex'; // show in navbar
+    if (nUserDisplay) nUserDisplay.style.display = 'flex'; // show in navbar
 
     // Request Location
     if (navigator.geolocation) {
         btnStart.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Mendapatkan Lokasi...`;
-        
+
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 userLocation = {
@@ -535,7 +535,7 @@ btnStart.addEventListener('click', () => {
                 };
                 sessionStorage.setItem(SESSION_LAT, userLocation.lat);
                 sessionStorage.setItem(SESSION_LON, userLocation.lon);
-                
+
                 startAppFlow();
                 // Pan map to user initially
                 setTimeout(() => { map.flyTo([userLocation.lat, userLocation.lon], 6); }, 500);
@@ -556,7 +556,7 @@ btnStart.addEventListener('click', () => {
 function startAppFlow() {
     onboardingOverlay.classList.remove('active');
     initMap();
-    initAudio(); 
+    initAudio();
     fetchQuakeData();
     setInterval(fetchQuakeData, 60000); // Poll every 1m
 }
@@ -567,14 +567,14 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedName) {
         userName = savedName;
         displayNameList.forEach(el => el.innerText = userName);
-        if(nUserDisplay) nUserDisplay.style.display = 'flex';
-        
+        if (nUserDisplay) nUserDisplay.style.display = 'flex';
+
         const savedLat = sessionStorage.getItem(SESSION_LAT);
         const savedLon = sessionStorage.getItem(SESSION_LON);
         if (savedLat && savedLon) {
             userLocation = { lat: parseFloat(savedLat), lon: parseFloat(savedLon) };
         }
-        
+
         startAppFlow();
         if (userLocation) {
             setTimeout(() => { map.flyTo([userLocation.lat, userLocation.lon], 6); }, 500);
