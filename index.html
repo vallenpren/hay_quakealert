@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Peringatan Dini Gempa - QuakeAlert</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Modal Welcome & Onboarding -->
+    <div id="onboarding-overlay" class="overlay active">
+        <div class="glass-modal">
+            <div class="modal-content">
+                <div class="icon-container-pulse">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                </div>
+                <h2>Selamat Datang di QuakeAlert</h2>
+                <p>Sistem Pemantauan dan Peringatan Dini Gempa interaktif dan real-time.</p>
+                <div class="input-group">
+                    <input type="text" id="user-name" placeholder="Masukkan Nama Anda" required autocomplete="off">
+                </div>
+                <div class="info-box">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                    <span>Kami membutuhkan akses lokasi (GPS) untuk mendeteksi jarak Anda dari pusat gempa dan memberikan peringatan akurat.</span>
+                </div>
+                <button id="btn-start" class="btn-primary">
+                    <i class="fa-solid fa-power-off"></i> Berikan Izin Lokasi & Mulai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <main class="app-container">
+        <!-- Map Container -->
+        <div id="map-container"></div>
+        
+        <!-- UI Overlay -->
+        <div class="ui-overlay">
+            <!-- Header -->
+            <header class="glass-panel header-bar">
+                <div class="user-greeting">
+                    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+                    <div class="greeting-text">
+                        <span class="hello">Halo,</span>
+                        <span id="display-name" class="name">Pengguna</span>
+                    </div>
+                </div>
+                <div class="app-title">
+                    <i class="fa-solid fa-wave-square"></i> QuakeAlert
+                </div>
+                <!-- Toggle Warning Settings -->
+                <div class="settings-toggle tooltip-container">
+                    <label class="switch">
+                        <input type="checkbox" id="alarm-toggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="tooltip-text">Alarm Peringatan Aktif</span>
+                    <span class="toggle-label"><i class="fa-solid fa-bell"></i></span>
+                </div>
+            </header>
+
+            <!-- Status Dashboard -->
+            <div class="dashboard layout-row">
+                <!-- Latest Quake Info Panel -->
+                <div class="glass-panel info-panel slide-in-left">
+                    <h3><i class="fa-solid fa-bolt text-warning"></i> Gempa Terkini</h3>
+                    <div class="latest-quake-details" id="latest-quake">
+                        <div class="loading-pulse">Memuat data BMKG...</div>
+                    </div>
+                    <div class="status-indicator">
+                        <div class="pulse-dot active"></div>
+                        <span>Live Sync BMKG</span>
+                    </div>
+                </div>
+
+                <!-- Alert Stats -->
+                <div class="glass-panel stats-panel slide-in-top">
+                    <div class="stat-box">
+                        <div class="stat-value" id="quake-count">-</div>
+                        <div class="stat-label">Total Gempa (Terkini)</div>
+                    </div>
+                    <div class="stat-box align-right">
+                        <div class="stat-value" id="user-distance">- km</div>
+                        <div class="stat-label">Jarak Pusat Gempa</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Quakes List -->
+            <div class="glass-panel recent-quakes slide-in-bottom">
+                <h3><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Terakhir</h3>
+                <div class="quake-list" id="quake-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Alarm UI Trigger -->
+        <div id="alarm-modal" class="overlay">
+            <div class="alarm-content shake-animation">
+                <i class="fa-solid fa-triangle-exclamation warning-icon"></i>
+                <h1 class="text-danger">PERINGATAN DINI!</h1>
+                <p>Gempa terdeteksi di sekitar area Anda.</p>
+                <div class="alarm-distance" id="alarm-distance-info">Jarak: -</div>
+                <p>Harap berlindung dan jauhi bangunan rentan!</p>
+                <button id="btn-stop-alarm" class="btn-danger">
+                    <i class="fa-solid fa-volume-xmark"></i> Matikan Alarm
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Custom script -->
+    <script src="script.js"></script>
+</body>
+</html>
