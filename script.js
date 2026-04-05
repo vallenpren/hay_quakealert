@@ -7,6 +7,7 @@ let alarmActive = false;
 let audioContext = null;
 let osc1 = null, osc2 = null, gainNode = null;
 let previousLatestQuakeTime = null; // to trigger alarm on new quake
+let cachedQuakeList = []; // For CSV export
 
 // Constants
 const SESSION_NAME = 'QA_userName';
@@ -296,6 +297,10 @@ function updateDashboard(latest, recentList) {
         riskStatus.className = 'risk-level text-secondary';
     }
 
+    // Cache list for institutional export
+    cachedQuakeList = [];
+    if (recentList && recentList.length > 0) cachedQuakeList = recentList;
+
     // Render Latest Quake in Dashboard
     latestQuakeContainer.innerHTML = `
         <div class="quake-meta">${latest.Tanggal} | ${latest.Jam} WIB</div>
@@ -407,6 +412,56 @@ function triggerAlarm(distance, info, mag) {
         <span style="font-size:1rem;color:white">${info}</span>
     `;
     playAlarm();
+}
+
+// Institutional Data Export (CSV)
+const btnExportCsv = document.getElementById('btn-export-csv');
+if (btnExportCsv) {
+    btnExportCsv.addEventListener('click', () => {
+        if (!cachedQuakeList || cachedQuakeList.length === 0) {
+            alert("Data BMKG belum dimuat. Harap tunggu.");
+            return;
+        }
+
+        // Prepare CSV Header
+        let csvContent = "Tanggal,Waktu_WIB,Lintang,Bujur,Magnitude_SR,Kedalaman,Jarak_Tujuan_KM,Arah_Evakuasi_Derajat,Status_Resiko,Potensi_Tsunami,Wilayah\n";
+
+        // Fill CSV Rows
+        cachedQuakeList.forEach(q => {
+            const [qLat, qLon] = q.Coordinates.split(',').map(Number);
+            const mag = parseFloat(q.Magnitude);
+            
+            let dist = "N/A";
+            let evaBear = "N/A";
+            let resiko = "AMAN";
+            
+            if (userLocation) {
+                dist = calculateDistance(userLocation.lat, userLocation.lon, qLat, qLon);
+                let bearing = calculateBearing(userLocation.lat, userLocation.lon, qLat, qLon);
+                evaBear = Math.round((bearing + 180) % 360); // Evacuation vector
+
+                if (dist < 150 && mag >= 5.0) resiko = "BAHAYA";
+                else if (dist < 500 && mag >= 4.0) resiko = "WASPADA";
+            }
+            
+            // Clean text for CSV (removing commas to prevent delimiter issues)
+            let wilayahClean = `"${q.Wilayah.replace(/"/g, '""')}"`;
+            let potensiClean = `"${q.Potensi ? q.Potensi.replace(/"/g, '""') : 'Tidak'}"`;
+
+            let row = `${q.Tanggal},${q.Jam},${qLat},${qLon},${mag},${q.Kedalaman},${dist},${evaBear},${resiko},${potensiClean},${wilayahClean}`;
+            csvContent += row + "\n";
+        });
+
+        // Trigger Download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Analisis_Spasial_QuakeAlert_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
 }
 
 // Events
