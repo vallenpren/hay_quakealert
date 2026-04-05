@@ -60,13 +60,15 @@ navItems.forEach(item => {
 // Initialize Map
 function initMap() {
     map = L.map('map-container', {
-        zoomControl: false // Move zoom control later if needed
+        zoomControl: false,
+        preferCanvas: true // Reduces DOM nodes for markers and circles, massive performance boost
     }).setView([-0.789, 113.921], 5); // Center of Indonesia
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap &copy; CARTO',
         subdomains: 'abcd',
-        maxZoom: 20
+        maxZoom: 20,
+        keepBuffer: 3 // Smooth panning
     }).addTo(map);
     
     L.control.zoom({ position: 'topright' }).addTo(map);
