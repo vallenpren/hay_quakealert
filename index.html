@@ -140,19 +140,31 @@
             
             <!-- UI Overlay -->
             <div class="ui-overlay">
-                <!-- Header Overlay di Map -->
                 <div class="header-bar glass-panel mt">
                     <div class="app-title-small">
-                        <i class="fa-solid fa-map-location-dot"></i> Peta Pantauan Real-Time
+                        <i class="fa-solid fa-satellite"></i> Tactical Map
                     </div>
-                    <!-- Toggle Warning Settings -->
-                    <div class="settings-toggle tooltip-container">
-                        <label class="switch">
-                            <input type="checkbox" id="alarm-toggle" checked>
-                            <span class="slider round"></span>
-                        </label>
-                        <span class="tooltip-text">Alarm Peringatan Aktif</span>
-                        <span class="toggle-label"><i class="fa-solid fa-bell"></i></span>
+                    
+                    <div class="header-controls">
+                        <!-- Map Type Settings -->
+                        <div class="settings-toggle tooltip-container">
+                            <label class="switch map-switch">
+                                <input type="checkbox" id="map-style-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="tooltip-text">Mode Satelit (Tactical)</span>
+                            <span class="toggle-label"><i class="fa-solid fa-earth-asia"></i></span>
+                        </div>
+                        
+                        <!-- Toggle Warning Settings -->
+                        <div class="settings-toggle tooltip-container">
+                            <label class="switch">
+                                <input type="checkbox" id="alarm-toggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="tooltip-text">Alarm Peringatan</span>
+                            <span class="toggle-label"><i class="fa-solid fa-bell"></i></span>
+                        </div>
                     </div>
                 </div>
 
@@ -189,15 +201,22 @@
                         </button>
                     </div>
 
-                    <!-- Alert Stats (Floats Right) -->
-                    <div class="glass-panel stats-panel slide-in-top">
+                    <!-- Alert Stats & Tactics (Floats Right) -->
+                    <div class="glass-panel stats-panel slide-in-top tactical-panel">
                         <div class="stat-box">
                             <div class="stat-value" id="quake-count">-</div>
-                            <div class="stat-label">Total Gempa (Terkini)</div>
+                            <div class="stat-label">Total Gempa</div>
                         </div>
                         <div class="stat-box align-right">
                             <div class="stat-value" id="user-distance">- km</div>
                             <div class="stat-label">Jarak Pusat Gempa</div>
+                        </div>
+                        <div class="stat-box evacuation-box">
+                            <div class="evacuation-header">
+                                <i class="fa-solid fa-location-arrow compass-icon" id="evacuation-compass"></i>
+                                <div class="risk-level" id="risk-status">AMAN</div>
+                            </div>
+                            <div class="stat-label mt-1">Arah Evakuasi & Status</div>
                         </div>
                     </div>
                 </div>

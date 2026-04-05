@@ -18,9 +18,10 @@ const onboardingOverlay = document.getElementById('onboarding-overlay');
 const btnStart = document.getElementById('btn-start');
 const userNameInput = document.getElementById('user-name');
 const displayNameList = [document.getElementById('display-name')]; // array for multiple places
-const navUserDisplay = document.getElementById('nav-user-display');
+const nUserDisplay = document.getElementById('nav-user-display');
 const btnReset = document.getElementById('btn-reset-profile');
 const alarmToggle = document.getElementById('alarm-toggle');
+const mapStyleToggle = document.getElementById('map-style-toggle');
 
 const latestQuakeContainer = document.getElementById('latest-quake');
 const quakeCountEl = document.getElementById('quake-count');
@@ -30,6 +31,10 @@ const quakeListEl = document.getElementById('quake-list');
 const alarmModal = document.getElementById('alarm-modal');
 const btnStopAlarm = document.getElementById('btn-stop-alarm');
 const alarmDistanceInfo = document.getElementById('alarm-distance-info');
+
+// Compass & Tactical Elements
+const evacuationCompass = document.getElementById('evacuation-compass');
+const riskStatus = document.getElementById('risk-status');
 
 // Constants
 const BMKG_AUTO_URL = 'https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json';
@@ -63,6 +68,18 @@ navItems.forEach(item => {
     });
 });
 
+let baseLayerDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        subdomains: 'abcd',
+        maxZoom: 20,
+        keepBuffer: 3 // Smooth panning
+    });
+
+let baseLayerSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri',
+        maxZoom: 20
+    });
+
 // Initialize Map
 function initMap() {
     map = L.map('map-container', {
@@ -70,14 +87,22 @@ function initMap() {
         preferCanvas: true // Reduces DOM nodes for markers and circles, massive performance boost
     }).setView([-0.789, 113.921], 5); // Center of Indonesia
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO',
-        subdomains: 'abcd',
-        maxZoom: 20,
-        keepBuffer: 3 // Smooth panning
-    }).addTo(map);
-    
+    baseLayerDark.addTo(map);
     L.control.zoom({ position: 'topright' }).addTo(map);
+}
+
+// Bearing Calculation for Compass
+function calculateBearing(lat1, lon1, lat2, lon2) {
+    const toRad = deg => deg * Math.PI / 180;
+    const toDeg = rad => rad * 180 / Math.PI;
+
+    const dLon = toRad(lon2 - lon1);
+    const y = Math.sin(dLon) * Math.cos(toRad(lat2));
+    const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
+            Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
+    
+    let brng = toDeg(Math.atan2(y, x));
+    return (brng + 360) % 360;
 }
 
 // Distance Calculation (Haversine Formula)
@@ -231,12 +256,44 @@ function updateDashboard(latest, recentList) {
 
     // Parse latest coordinates
     const [latLatest, lonLatest] = latest.Coordinates.split(',').map(Number);
+    const magLatest = parseFloat(latest.Magnitude);
     
     // Check for distance if user location is available
     let distanceToUser = null;
+    let bearingToQuake = null;
     if (userLocation) {
         distanceToUser = calculateDistance(userLocation.lat, userLocation.lon, latLatest, lonLatest);
         userDistanceEl.innerText = `${distanceToUser} km`;
+        
+        // Tactical Compass Logic
+        bearingToQuake = calculateBearing(userLocation.lat, userLocation.lon, latLatest, lonLatest);
+        // We point AWAY from the quake (180 deg opposite) for Evacuation Direction
+        let evacuationBearing = (bearingToQuake + 180) % 360;
+        
+        // CSS expects rotation from Top. The icon fa-location-arrow points top-right (45deg).
+        // Correcting: fa-location-arrow default points Top-Right (45 deg). We need it to point to evacuationBearing.
+        // So applied rotation = evacuationBearing - 45.
+        evacuationCompass.style.transform = `rotate(${Math.round(evacuationBearing - 45)}deg)`;
+        
+        // Tactical Risk Assessment
+        riskStatus.className = 'risk-level'; // reset
+        if (distanceToUser < 150 && magLatest >= 5.0) {
+            riskStatus.innerText = "BAHAYA";
+            riskStatus.classList.add('risk-bahaya');
+            evacuationCompass.style.color = "var(--danger)";
+        } else if (distanceToUser < 500 && magLatest >= 4.0) {
+            riskStatus.innerText = "WASPADA";
+            riskStatus.classList.add('risk-waspada');
+            evacuationCompass.style.color = "var(--warning)";
+        } else {
+            riskStatus.innerText = "AMAN";
+            riskStatus.classList.add('risk-aman');
+            evacuationCompass.style.color = "var(--success)";
+        }
+    } else {
+        evacuationCompass.style.transform = 'rotate(-45deg)'; // default straight up
+        riskStatus.innerText = "NO-GPS";
+        riskStatus.className = 'risk-level text-secondary';
     }
 
     // Render Latest Quake in Dashboard
@@ -301,14 +358,24 @@ function updateDashboard(latest, recentList) {
     latestMarker.addTo(map);
     mapMarkers.push(latestMarker);
 
-    // Latest Circle
+    // Latest Circle with tactical styling
     const latestRadius = L.circle([latLatest, lonLatest], {
         color: '#ef4444',
         fillColor: '#ef4444',
-        fillOpacity: 0.3,
+        fillOpacity: 0.2,
+        weight: 1,
         radius: parseFloat(latest.Magnitude) * 20000
     }).addTo(map);
     mapMarkers.push(latestRadius);
+    
+    // Add immersive radar sweep layer
+    const radarSweep = L.divIcon({
+        className: '',
+        html: `<div class="radar-sweep" style="width:${parseFloat(latest.Magnitude)*15}px; height:${parseFloat(latest.Magnitude)*15}px;"></div>`,
+        iconSize: [parseFloat(latest.Magnitude)*15, parseFloat(latest.Magnitude)*15]
+    });
+    const radarMarker = L.marker([latLatest, lonLatest], { icon: radarSweep, zIndexOffset: 999 }).addTo(map);
+    mapMarkers.push(radarMarker);
 
     // Add User Marker
     if (userLocation) {
@@ -343,6 +410,21 @@ function triggerAlarm(distance, info, mag) {
 }
 
 // Events
+if (mapStyleToggle) {
+    mapStyleToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+            map.removeLayer(baseLayerDark);
+            baseLayerSat.addTo(map);
+            // Fix inversion on Satellite
+            document.querySelector('.leaflet-layer').style.filter = "none";
+        } else {
+            map.removeLayer(baseLayerSat);
+            baseLayerDark.addTo(map);
+            document.querySelector('.leaflet-layer').style.filter = "invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)";
+        }
+    });
+}
+
 const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
 const dashboardSidebar = document.getElementById('dashboard-sidebar');
 
@@ -384,7 +466,7 @@ btnStart.addEventListener('click', () => {
     sessionStorage.setItem(SESSION_NAME, userName);
 
     displayNameList.forEach(el => el.innerText = userName);
-    navUserDisplay.style.display = 'flex'; // show in navbar
+    if(nUserDisplay) nUserDisplay.style.display = 'flex'; // show in navbar
 
     // Request Location
     if (navigator.geolocation) {
@@ -430,7 +512,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedName) {
         userName = savedName;
         displayNameList.forEach(el => el.innerText = userName);
-        navUserDisplay.style.display = 'flex';
+        if(nUserDisplay) nUserDisplay.style.display = 'flex';
         
         const savedLat = sessionStorage.getItem(SESSION_LAT);
         const savedLon = sessionStorage.getItem(SESSION_LON);

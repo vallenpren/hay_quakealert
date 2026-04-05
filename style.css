@@ -462,6 +462,11 @@ button {
     padding: 15px 25px;
 }
 
+.header-controls {
+    display: flex;
+    gap: 20px;
+}
+
 .app-title-small {
     font-size: 1.2rem;
     font-weight: 700;
@@ -651,6 +656,38 @@ input:checked ~ .toggle-label {
     border-radius: 12px;
     min-width: 150px;
 }
+
+/* Tactical Panel Ext */
+.tactical-panel {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-end;
+}
+.evacuation-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid var(--primary) !important;
+    background: rgba(59, 130, 246, 0.1) !important;
+}
+.evacuation-header {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+.compass-icon {
+    font-size: 2rem;
+    color: var(--primary);
+    transition: transform 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+.risk-level {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+.risk-aman { color: var(--success); }
+.risk-waspada { color: var(--warning); }
+.risk-bahaya { color: var(--danger); animation: flash 1s infinite alternate; }
+
 .stat-box.align-right { text-align: right; }
 .stat-value {
     font-size: 1.8rem;
@@ -797,6 +834,17 @@ input:checked ~ .toggle-label {
     0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
     70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
     100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Radar Sweep Anim */
+.radar-sweep {
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(239,68,68,0) 70%, rgba(239,68,68,0.8) 100%);
+    animation: sweep 2s linear infinite;
+}
+
+@keyframes sweep {
+    to { transform: rotate(360deg); }
 }
 
 @keyframes flash {
