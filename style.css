@@ -880,26 +880,27 @@ input:checked ~ .toggle-label {
     .founder-quote i:first-child { display: none; }
     
     /* Layout */
-    .app-container { padding-top: 0; padding-bottom: 70px; }
-    .view-section { top: 0; bottom: 70px; }
+    .app-container { padding-top: 70px; padding-bottom: 0; }
+    .view-section { top: 70px; bottom: 0; }
     #map-container { bottom: 0; }
     
-    /* Bottom Navigation Bar for Mobile Fix */
+    /* Top Navigation Bar for Mobile */
     .glass-navbar {
         position: fixed !important;
-        top: auto !important; 
-        bottom: 0 !important;
+        top: 0 !important; 
+        bottom: auto !important;
         left: 0; right: 0;
-        height: 70px; /* Strong explicit height */
+        height: 70px; 
         padding: 0; 
-        border-bottom: none; 
-        border-top: 1px solid var(--glass-border);
+        border-bottom: 1px solid var(--glass-border); 
+        border-top: none;
         justify-content: center;
         align-items: center;
-        background: rgba(15, 23, 42, 1) !important; /* Solid dark so it pops */
+        background: rgba(15, 23, 42, 1) !important; 
         z-index: 9999;
         display: flex !important;
-        padding-bottom: env(safe-area-inset-bottom, 0); /* Fix for iOS/Android bottom swipe bar hiding things */
+        padding-top: env(safe-area-inset-top, 0);
+        padding-bottom: 0;
     }
     
     .nav-brand { display: none !important; }
@@ -934,7 +935,8 @@ input:checked ~ .toggle-label {
         background: transparent;
         box-shadow: none;
         color: var(--primary);
-        border-top: 3px solid var(--primary);
+        border-top: none;
+        border-bottom: 3px solid var(--primary);
     }
     .nav-item i { font-size: 1.4rem; }
     
