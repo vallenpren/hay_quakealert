@@ -11,7 +11,7 @@
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css?v=2.0.1">
+    <link rel="stylesheet" href="style.css?v=2.0.2">
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -146,13 +146,29 @@
                     </div>
                     
                     <div class="header-controls">
+                        <!-- Sidebar Toggle Switch -->
+                        <div class="settings-toggle tooltip-container">
+                            <button id="btn-toggle-sidebar" class="btn-icon">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </button>
+                            <span class="tooltip-text">Panel Data</span>
+                        </div>
+                        
+                        <!-- Unduh Laporan CSV -->
+                        <div class="settings-toggle tooltip-container">
+                            <button id="btn-export-csv" class="btn-icon">
+                                <i class="fa-solid fa-file-csv"></i>
+                            </button>
+                            <span class="tooltip-text">Ekspor Analisis (CSV)</span>
+                        </div>
+
                         <!-- Map Type Settings -->
                         <div class="settings-toggle tooltip-container">
                             <label class="switch map-switch">
                                 <input type="checkbox" id="map-style-toggle">
                                 <span class="slider round"></span>
                             </label>
-                            <span class="tooltip-text">Mode Satelit (Tactical)</span>
+                            <span class="tooltip-text">Mode Satelit</span>
                             <span class="toggle-label"><i class="fa-solid fa-earth-asia"></i></span>
                         </div>
                         
@@ -200,16 +216,8 @@
                                 <div class="quake-list" id="quake-list">
                                     <!-- Populated by JS -->
                                 </div>
-                                <button id="btn-export-csv" class="btn-primary mt-3" style="width: 100%; padding: 10px; font-size: 0.9rem;" title="Ekspor data spasial untuk olah data institusi/GIS">
-                                    <i class="fa-solid fa-file-csv"></i> Unduh Laporan Analisis (CSV)
-                                </button>
                             </div>
                         </div>
-                        
-                        <!-- Toggle Button -->
-                        <button id="btn-toggle-sidebar" class="btn-sidebar-toggle" title="Toggle Panel">
-                            <i class="fa-solid fa-chevron-left" id="sidebar-icon"></i>
-                        </button>
                     </div>
 
                     <!-- Alert Stats & Tactics (Floats Right) -->

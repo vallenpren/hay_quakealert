@@ -476,6 +476,24 @@ button {
     color: white;
 }
 
+.btn-icon {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--glass-border);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-icon:hover {
+    background: var(--primary);
+    transform: scale(1.1);
+}
+
 /* Settings Toggle */
 .settings-toggle {
     display: flex;
@@ -556,33 +574,6 @@ input:checked ~ .toggle-label {
     display: flex;
     flex-direction: column;
     max-height: 100%;
-}
-
-/* Sidebar Toggle Button */
-.btn-sidebar-toggle {
-    background: var(--primary);
-    color: white;
-    border: none;
-    width: 30px;
-    height: 60px;
-    border-radius: 0 10px 10px 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
-    transition: background 0.3s;
-    margin-top: 20px;
-}
-.btn-sidebar-toggle:hover { background: #2563eb; }
-.btn-sidebar-toggle i {
-    transition: transform 0.4s;
-}
-.sidebar-wrapper.open .btn-sidebar-toggle i {
-    transform: rotate(0deg);
-}
-.sidebar-wrapper:not(.open) .btn-sidebar-toggle i {
-    transform: rotate(180deg);
 }
 
 /* Info Panel */
