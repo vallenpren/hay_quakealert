@@ -454,6 +454,9 @@ button {
     margin-top: 10px;
 }
 
+.mt { margin-top: 10px; }
+.mt-3 { margin-top: 15px; }
+
 .header-bar {
     pointer-events: auto;
     display: flex;
@@ -649,7 +652,7 @@ input:checked ~ .toggle-label {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
 }
-.stats-panel .stat-box {
+.stat-box {
     background: rgba(15, 23, 42, 0.95);
     border: 1px solid var(--glass-border);
     padding: 15px 25px;

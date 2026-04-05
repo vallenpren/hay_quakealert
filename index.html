@@ -180,9 +180,17 @@
                                 <div class="latest-quake-details" id="latest-quake">
                                     <div class="loading-pulse">Memuat data BMKG...</div>
                                 </div>
-                                <div class="status-indicator">
+                                <div class="status-indicator mt">
                                     <div class="pulse-dot active"></div>
                                     <span>Live Sync BMKG</span>
+                                </div>
+                                
+                                <div class="stat-box evacuation-box mt">
+                                    <div class="evacuation-header">
+                                        <i class="fa-solid fa-location-arrow compass-icon" id="evacuation-compass"></i>
+                                        <div class="risk-level" id="risk-status">AMAN</div>
+                                    </div>
+                                    <div class="stat-label mt-1">Arah Evakuasi & Status</div>
                                 </div>
                             </div>
         
@@ -210,13 +218,6 @@
                         <div class="stat-box align-right">
                             <div class="stat-value" id="user-distance">- km</div>
                             <div class="stat-label">Jarak Pusat Gempa</div>
-                        </div>
-                        <div class="stat-box evacuation-box">
-                            <div class="evacuation-header">
-                                <i class="fa-solid fa-location-arrow compass-icon" id="evacuation-compass"></i>
-                                <div class="risk-level" id="risk-status">AMAN</div>
-                            </div>
-                            <div class="stat-label mt-1">Arah Evakuasi & Status</div>
                         </div>
                     </div>
                 </div>
