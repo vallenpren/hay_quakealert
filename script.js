@@ -414,19 +414,18 @@ function triggerAlarm(distance, info, mag) {
     playAlarm();
 }
 
-// Institutional Data Export (CSV)
-const btnExportCsv = document.getElementById('btn-export-csv');
-if (btnExportCsv) {
-    btnExportCsv.addEventListener('click', () => {
+// Institutional Data Export (Excel via SheetJS)
+const btnExportExcel = document.getElementById('btn-export-excel');
+if (btnExportExcel) {
+    btnExportExcel.addEventListener('click', () => {
         if (!cachedQuakeList || cachedQuakeList.length === 0) {
             alert("Data BMKG belum dimuat. Harap tunggu.");
             return;
         }
 
-        // Prepare CSV Header
-        let csvContent = "Tanggal,Waktu_WIB,Lintang,Bujur,Magnitude_SR,Kedalaman,Jarak_Tujuan_KM,Arah_Evakuasi_Derajat,Status_Resiko,Potensi_Tsunami,Wilayah\n";
+        // Prepare Array for Excel
+        let excelData = [];
 
-        // Fill CSV Rows
         cachedQuakeList.forEach(q => {
             const [qLat, qLon] = q.Coordinates.split(',').map(Number);
             const mag = parseFloat(q.Magnitude);
@@ -444,23 +443,35 @@ if (btnExportCsv) {
                 else if (dist < 500 && mag >= 4.0) resiko = "WASPADA";
             }
 
-            // Clean text for CSV (removing commas to prevent delimiter issues)
-            let wilayahClean = `"${q.Wilayah.replace(/"/g, '""')}"`;
-            let potensiClean = `"${q.Potensi ? q.Potensi.replace(/"/g, '""') : 'Tidak'}"`;
-
-            let row = `${q.Tanggal},${q.Jam},${qLat},${qLon},${mag},${q.Kedalaman},${dist},${evaBear},${resiko},${potensiClean},${wilayahClean}`;
-            csvContent += row + "\n";
+            excelData.push({
+                "Tanggal": q.Tanggal,
+                "Waktu WIB": q.Jam,
+                "Lintang": qLat,
+                "Bujur": qLon,
+                "Magnitude (SR)": mag,
+                "Kedalaman": q.Kedalaman,
+                "Jarak dari Anda (KM)": dist,
+                "Arah Evakuasi (Derajat)": evaBear,
+                "Status Resiko": resiko,
+                "Potensi Tsunami": q.Potensi || "Tidak",
+                "Wilayah": q.Wilayah
+            });
         });
 
-        // Trigger Download
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", `Analisis_Spasial_QuakeAlert_${new Date().toISOString().slice(0, 10)}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // Generate Excel Workbook
+        const ws = XLSX.utils.json_to_sheet(excelData);
+        // Optimalkan lebar kolom
+        const wscols = [
+            {wch: 15}, {wch: 15}, {wch: 12}, {wch: 12}, {wch: 15},
+            {wch: 15}, {wch: 22}, {wch: 25}, {wch: 18}, {wch: 25}, {wch: 45}
+        ];
+        ws['!cols'] = wscols;
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Data Gempa QuakeAlert");
+        
+        // Trigger Download File .xlsx
+        XLSX.writeFile(wb, `Analisis_QuakeAlert_${new Date().toISOString().slice(0, 10)}.xlsx`);
     });
 }
 

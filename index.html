@@ -154,12 +154,12 @@
                             <span class="tooltip-text">Panel Data</span>
                         </div>
                         
-                        <!-- Unduh Laporan CSV -->
+                        <!-- Unduh Laporan Excel PowerBI -->
                         <div class="settings-toggle tooltip-container">
-                            <button id="btn-export-csv" class="btn-icon">
-                                <i class="fa-solid fa-file-csv"></i>
+                            <button id="btn-export-excel" class="btn-icon" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4);">
+                                <i class="fa-solid fa-file-excel"></i>
                             </button>
-                            <span class="tooltip-text">Ekspor Analisis (CSV)</span>
+                            <span class="tooltip-text">Ekspor ke Excel</span>
                         </div>
 
                         <!-- Map Type Settings -->
@@ -252,6 +252,8 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- SheetJS (Excel Export) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Custom script -->
     <script src="script.js?v=2.0.1"></script>
 </body>
