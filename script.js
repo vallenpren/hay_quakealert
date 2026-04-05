@@ -343,6 +343,15 @@ function triggerAlarm(distance, info, mag) {
 }
 
 // Events
+const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+const dashboardSidebar = document.getElementById('dashboard-sidebar');
+
+if (btnToggleSidebar) {
+    btnToggleSidebar.addEventListener('click', () => {
+        dashboardSidebar.classList.toggle('open');
+    });
+}
+
 if (btnReset) {
     btnReset.addEventListener('click', () => {
         sessionStorage.removeItem(SESSION_NAME);

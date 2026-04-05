@@ -518,11 +518,63 @@ input:checked ~ .toggle-label {
     color: var(--warning);
 }
 
-/* Dashboard Layout */
-.layout-row {
-    display: grid;
-    grid-template-columns: 350px 1fr;
-    gap: 20px;
+/* Dashboard Container Main Layout */
+.dashboard-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+    height: calc(100vh - 180px); /* Fill remaining space */
+}
+
+/* Sidebar Wrapper Sliding System */
+.sidebar-wrapper {
+    position: absolute;
+    left: -350px; /* Hidden by default */
+    top: 0;
+    display: flex;
+    align-items: flex-start;
+    transition: left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 20;
+    pointer-events: auto;
+}
+
+.sidebar-wrapper.open {
+    left: 0; /* slide in */
+}
+
+.sidebar-content-area {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+}
+
+/* Sidebar Toggle Button */
+.btn-sidebar-toggle {
+    background: var(--primary);
+    color: white;
+    border: none;
+    width: 30px;
+    height: 60px;
+    border-radius: 0 10px 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    transition: background 0.3s;
+    margin-top: 20px;
+}
+.btn-sidebar-toggle:hover { background: #2563eb; }
+.btn-sidebar-toggle i {
+    transition: transform 0.4s;
+}
+.sidebar-wrapper.open .btn-sidebar-toggle i {
+    transform: rotate(0deg);
+}
+.sidebar-wrapper:not(.open) .btn-sidebar-toggle i {
+    transform: rotate(180deg);
 }
 
 /* Info Panel */
@@ -613,14 +665,14 @@ input:checked ~ .toggle-label {
     margin-top: 5px;
 }
 
-/* Recent Quakes List - Bottom Left */
+/* Recent Quakes List */
 .recent-quakes {
     pointer-events: auto;
-    width: 350px;
-    max-height: 40vh;
+    width: 100%;
+    max-height: calc(100vh - 400px); /* Fit window */
     display: flex;
     flex-direction: column;
-    margin-top: auto; /* Push to bottom */
+    margin-top: 15px;
 }
 
 .recent-quakes h3 {
@@ -775,7 +827,6 @@ input:checked ~ .toggle-label {
 /* Responsiveness adjustments */
 @media (max-width: 900px) {
     .home-grid { grid-template-columns: 1fr; }
-    .layout-row { grid-template-columns: 1fr; }
     .stats-panel { justify-content: flex-start; margin-top: 10px; }
     .nav-user { display: none !important; }
     
@@ -799,7 +850,7 @@ input:checked ~ .toggle-label {
         border-top: 1px solid var(--glass-border);
         justify-content: center;
         background: rgba(15, 23, 42, 0.95); /* less blur for perf */
-        backdrop-filter: blur(5px);
+        /* backdrop-filter: blur(5px); */
     }
     
     .nav-brand { display: none; }
@@ -821,11 +872,18 @@ input:checked ~ .toggle-label {
     }
     .nav-item i { font-size: 1.2rem; }
     
+    /* MAP VIEW MOBILE */
+    .dashboard-container { flex-direction: column; }
+    .sidebar-wrapper { left: -300px; }
+    .sidebar-wrapper.open { left: 0; }
+    .sidebar-content-area { width: 300px; }
+    .stats-panel { position: absolute; right: 0; top: 0; display: none; } /* Hide stats on mobile if too cramped */
+    
     /* Reduce map overlay padding */
     .ui-overlay { padding: 10px; }
-    .glass-panel { padding: 15px; backdrop-filter: blur(5px); } /* heavily optimize blur for mobile */
+    .glass-panel { padding: 15px; } /* heavily optimize blur for mobile */
     .header-bar { padding: 10px 15px; }
-    .recent-quakes { width: 100%; max-height: 25vh; }
+    .recent-quakes { width: 100%; max-height: 40vh; }
 }
 
 /* Perf optimizing */

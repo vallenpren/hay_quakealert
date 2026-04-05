@@ -156,21 +156,40 @@
                     </div>
                 </div>
 
-                <!-- Status Dashboard -->
-                <div class="dashboard layout-row">
-                    <!-- Latest Quake Info Panel -->
-                    <div class="glass-panel info-panel slide-in-left">
-                        <h3><i class="fa-solid fa-bolt text-warning"></i> Gempa Terkini</h3>
-                        <div class="latest-quake-details" id="latest-quake">
-                            <div class="loading-pulse">Memuat data BMKG...</div>
+                <!-- Dashboard Layout -->
+                <div class="dashboard-container">
+                    
+                    <!-- Sidebar for Info & History -->
+                    <div class="sidebar-wrapper open" id="dashboard-sidebar">
+                        <div class="sidebar-content-area">
+                            <!-- Latest Quake Info Panel -->
+                            <div class="glass-panel info-panel">
+                                <h3><i class="fa-solid fa-bolt text-warning"></i> Gempa Terkini</h3>
+                                <div class="latest-quake-details" id="latest-quake">
+                                    <div class="loading-pulse">Memuat data BMKG...</div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div class="pulse-dot active"></div>
+                                    <span>Live Sync BMKG</span>
+                                </div>
+                            </div>
+        
+                            <!-- Recent Quakes List -->
+                            <div class="glass-panel recent-quakes mt">
+                                <h3><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Terakhir</h3>
+                                <div class="quake-list" id="quake-list">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
                         </div>
-                        <div class="status-indicator">
-                            <div class="pulse-dot active"></div>
-                            <span>Live Sync BMKG</span>
-                        </div>
+                        
+                        <!-- Toggle Button -->
+                        <button id="btn-toggle-sidebar" class="btn-sidebar-toggle" title="Toggle Panel">
+                            <i class="fa-solid fa-chevron-left" id="sidebar-icon"></i>
+                        </button>
                     </div>
 
-                    <!-- Alert Stats -->
+                    <!-- Alert Stats (Floats Right) -->
                     <div class="glass-panel stats-panel slide-in-top">
                         <div class="stat-box">
                             <div class="stat-value" id="quake-count">-</div>
@@ -180,14 +199,6 @@
                             <div class="stat-value" id="user-distance">- km</div>
                             <div class="stat-label">Jarak Pusat Gempa</div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Recent Quakes List -->
-                <div class="glass-panel recent-quakes slide-in-bottom">
-                    <h3><i class="fa-solid fa-clock-rotate-left"></i> Riwayat Terakhir</h3>
-                    <div class="quake-list" id="quake-list">
-                        <!-- Populated by JS -->
                     </div>
                 </div>
             </div> <!-- End UI Overlay -->
