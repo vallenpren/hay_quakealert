@@ -26,7 +26,8 @@ body {
     background-color: var(--bg-dark);
     color: var(--text-primary);
     overflow: hidden;
-    height: 100vh;
+    height: 100vh; /* fallback */
+    height: 100dvh; /* fixes mobile browser bottom overlap */
     width: 100vw;
 }
 
@@ -885,6 +886,7 @@ input:checked ~ .toggle-label {
     
     /* Bottom Navigation Bar for Mobile Fix */
     .glass-navbar {
+        position: fixed !important;
         top: auto !important; 
         bottom: 0 !important;
         left: 0; right: 0;
