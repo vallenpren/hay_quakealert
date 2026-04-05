@@ -8,12 +8,18 @@ let audioContext = null;
 let osc1 = null, osc2 = null, gainNode = null;
 let previousLatestQuakeTime = null; // to trigger alarm on new quake
 
+// Constants
+const SESSION_NAME = 'QA_userName';
+const SESSION_LAT = 'QA_userLat';
+const SESSION_LON = 'QA_userLon';
+
 // DOM Elements
 const onboardingOverlay = document.getElementById('onboarding-overlay');
 const btnStart = document.getElementById('btn-start');
 const userNameInput = document.getElementById('user-name');
 const displayNameList = [document.getElementById('display-name')]; // array for multiple places
 const navUserDisplay = document.getElementById('nav-user-display');
+const btnReset = document.getElementById('btn-reset-profile');
 const alarmToggle = document.getElementById('alarm-toggle');
 
 const latestQuakeContainer = document.getElementById('latest-quake');
@@ -203,7 +209,7 @@ const earthquakeIcon = L.divIcon({
 
 const latestQuakeIcon = L.divIcon({
     className: 'custom-quake-marker-latest',
-    html: `<div style="background:var(--danger); width:20px; height:20px; border-radius:50%; box-shadow:0 0 20px var(--danger); border:3px solid white; animation: pulse-primary 1s infinite;"></div>`,
+    html: `<div style="background:var(--danger); width:20px; height:20px; border-radius:50%; box-shadow:0 0 15px var(--danger); border:3px solid white;"></div>`,
     iconSize: [26, 26]
 });
 
@@ -337,6 +343,15 @@ function triggerAlarm(distance, info, mag) {
 }
 
 // Events
+if (btnReset) {
+    btnReset.addEventListener('click', () => {
+        sessionStorage.removeItem(SESSION_NAME);
+        sessionStorage.removeItem(SESSION_LAT);
+        sessionStorage.removeItem(SESSION_LON);
+        window.location.reload();
+    });
+}
+
 alarmToggle.addEventListener('change', (e) => {
     alarmEnabled = e.target.checked;
     if (!alarmEnabled && alarmActive) {
@@ -357,6 +372,8 @@ btnStart.addEventListener('click', () => {
         return;
     }
     userName = name;
+    sessionStorage.setItem(SESSION_NAME, userName);
+
     displayNameList.forEach(el => el.innerText = userName);
     navUserDisplay.style.display = 'flex'; // show in navbar
 
@@ -370,6 +387,8 @@ btnStart.addEventListener('click', () => {
                     lat: position.coords.latitude,
                     lon: position.coords.longitude
                 };
+                sessionStorage.setItem(SESSION_LAT, userLocation.lat);
+                sessionStorage.setItem(SESSION_LON, userLocation.lon);
                 
                 startAppFlow();
                 // Pan map to user initially
@@ -398,6 +417,24 @@ function startAppFlow() {
 
 // Setup Initial State
 window.addEventListener('DOMContentLoaded', () => {
-    // Show splash / onboarding
-    onboardingOverlay.classList.add('active');
+    const savedName = sessionStorage.getItem(SESSION_NAME);
+    if (savedName) {
+        userName = savedName;
+        displayNameList.forEach(el => el.innerText = userName);
+        navUserDisplay.style.display = 'flex';
+        
+        const savedLat = sessionStorage.getItem(SESSION_LAT);
+        const savedLon = sessionStorage.getItem(SESSION_LON);
+        if (savedLat && savedLon) {
+            userLocation = { lat: parseFloat(savedLat), lon: parseFloat(savedLon) };
+        }
+        
+        startAppFlow();
+        if (userLocation) {
+            setTimeout(() => { map.flyTo([userLocation.lat, userLocation.lon], 6); }, 500);
+        }
+    } else {
+        // Show splash / onboarding
+        onboardingOverlay.classList.add('active');
+    }
 });

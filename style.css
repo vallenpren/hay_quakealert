@@ -32,9 +32,8 @@ body {
 
 /* Glassmorphism Utilities */
 .glass-modal, .glass-panel {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(15, 23, 42, 0.95); /* Solid transparent, removes lag */
+    /* backdrop-filter: blur(12px) - removed for performance */
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
     border-radius: 16px;
@@ -47,8 +46,8 @@ body {
 .overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.85);
+    /* backdrop-filter: blur(8px); removed for perf */
     z-index: 9999;
     display: flex;
     justify-content: center;
@@ -169,8 +168,8 @@ button {
 .glass-navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    background: var(--glass-navbar);
-    backdrop-filter: blur(15px);
+    background: rgba(15, 23, 42, 0.95);
+    /* backdrop-filter: blur(15px); removed for perf */
     border-bottom: 1px solid var(--glass-border);
     display: flex;
     justify-content: space-between;
@@ -225,8 +224,22 @@ button {
 .nav-user {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     font-weight: 600;
+}
+
+.btn-reset {
+    background: transparent;
+    border: 1px solid var(--danger);
+    color: var(--danger);
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-reset:hover {
+    background: rgba(239, 68, 68, 0.2);
 }
 
 .nav-user i {
@@ -580,8 +593,7 @@ input:checked ~ .toggle-label {
     -webkit-backdrop-filter: none;
 }
 .stats-panel .stat-box {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
+    background: rgba(15, 23, 42, 0.95);
     border: 1px solid var(--glass-border);
     padding: 15px 25px;
     border-radius: 12px;
@@ -714,9 +726,8 @@ input:checked ~ .toggle-label {
 }
 
 .leaflet-popup-content-wrapper {
-    background: var(--glass-bg);
+    background: rgba(15, 23, 42, 0.95);
     color: white;
-    backdrop-filter: blur(10px);
     border: 1px solid var(--glass-border);
 }
 .leaflet-popup-tip {
