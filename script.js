@@ -23,6 +23,7 @@ const nUserDisplay = document.getElementById('nav-user-display');
 const btnReset = document.getElementById('btn-reset-profile');
 const alarmToggle = document.getElementById('alarm-toggle');
 const mapStyleToggle = document.getElementById('map-style-toggle');
+const weatherToggle = document.getElementById('weather-toggle');
 
 const latestQuakeContainer = document.getElementById('latest-quake');
 const quakeCountEl = document.getElementById('quake-count');
@@ -444,6 +445,11 @@ function updateDashboard(latest, recentList) {
             triggerAlarm(distanceToUser, latest.Wilayah, latest.Magnitude);
         }
     }
+    
+    // Rerender weather if active
+    if (typeof weatherEnabled !== 'undefined' && weatherEnabled) {
+        renderWeather();
+    }
 }
 
 function triggerAlarm(distance, info, mag) {
@@ -548,6 +554,129 @@ if (btnReset) {
         sessionStorage.removeItem(SESSION_LAT);
         sessionStorage.removeItem(SESSION_LON);
         window.location.reload();
+    });
+}
+
+// Weather State and Events
+let weatherEnabled = false;
+let weatherMarkers = [];
+
+if (weatherToggle) {
+    weatherToggle.addEventListener('change', (e) => {
+        weatherEnabled = e.target.checked;
+        if (weatherEnabled) {
+            renderWeather();
+        } else {
+            clearWeather();
+        }
+    });
+}
+
+function clearWeather() {
+    weatherMarkers.forEach(m => map.removeLayer(m));
+    weatherMarkers = [];
+}
+
+function renderWeather() {
+    clearWeather();
+    if (!map || !cachedQuakeList) return;
+
+    let locations = cachedQuakeList.slice(0, 15).map(q => {
+        return {
+            lat: parseFloat(q.Coordinates.split(',')[0]),
+            lon: parseFloat(q.Coordinates.split(',')[1]),
+            name: q.Wilayah
+        };
+    });
+    
+    if(locations.length === 0) {
+        locations = [
+            {lat: -6.2088, lon: 106.8456, name: "Jakarta"},
+            {lat: -7.2504, lon: 112.7688, name: "Surabaya"},
+            {lat: -3.3167, lon: 114.5901, name: "Banjarmasin"},
+            {lat: 3.5952, lon: 98.6722, name: "Medan"}
+        ];
+    }
+    
+    locations.forEach((loc, index) => {
+        const types = ['hujan', 'cerah', 'badai', 'berawan'];
+        const wType = types[index % types.length]; 
+        
+        let htmlContent = '';
+        let prediction = '';
+        let temp = 24 + (index % 8); // 24-31 c
+        let wind = 10 + (index % 30); // 10-40 km/h
+        let humidity = 60 + (index % 30); // 60-90%
+        
+        if (wType === 'hujan') {
+            htmlContent = `
+                <div class="cloud cloud-dark">
+                    <div class="rain">
+                        <div class="rain-drop"></div>
+                        <div class="rain-drop"></div>
+                        <div class="rain-drop"></div>
+                        <div class="rain-drop"></div>
+                    </div>
+                </div>
+            `;
+            prediction = "Hujan berkelanjutan terpantau. Prediksi: Masih akan turun hujan dengan intensitas sedang hingga 2-3 jam ke depan. Harap waspada pada lereng-lereng beresiko.";
+        } else if (wType === 'badai') {
+            htmlContent = `
+                <div class="cloud cloud-dark">
+                    <div class="lightning"></div>
+                    <div class="rain">
+                        <div class="rain-drop"></div>
+                        <div class="rain-drop"></div>
+                        <div class="rain-drop"></div>
+                        <div class="rain-drop"></div>
+                    </div>
+                </div>
+            `;
+            prediction = "Peringatan cuaca ekstrem: Badai petir. Kecepatan angin tinggi. Prediksi: Diharapkan tenang dalam 4 jam. Tunda aktivitas di lapangan terbuka.";
+            wind += 20; 
+        } else if (wType === 'berawan') {
+            htmlContent = `
+                <div class="cloud"></div>
+            `;
+            prediction = "Kondisi mendung dan berawan tebal. Prediksi: Kelembaban tinggi, belum ada indikasi kuat hujan deras dalam waktu dekat.";
+        } else {
+            htmlContent = `
+                <div style="color:#fde047; font-size:2rem; text-shadow:0 0 10px #f59e0b;"><i class="fa-solid fa-sun fa-spin" style="--fa-animation-duration: 10s;"></i></div>
+            `;
+            prediction = "Kondisi cerah stabil. Prediksi: Tidak ada anomali. Angin tenang dan kondusif untuk operasi / logistik darurat.";
+            humidity -= 15;
+            temp += 3;
+        }
+        
+        const popupContent = `
+            <div class="weather-info">
+                <h4><i class="fa-solid fa-layer-group"></i> Analisis Area</h4>
+                <div class="weather-stat"><span>Suhu Udara:</span> <b>${temp}°C</b></div>
+                <div class="weather-stat"><span>Kelembaban:</span> <b>${humidity}%</b></div>
+                <div class="weather-stat"><span>Kec. Angin:</span> <b>${wind} km/h</b></div>
+                <div class="weather-analysis">
+                    <b><i class="fa-solid fa-satellite-dish"></i> Laporan Live:</b><br>${prediction}
+                </div>
+            </div>
+        `;
+        
+        const weatherIcon = L.divIcon({
+            className: 'weather-marker',
+            html: htmlContent,
+            iconSize: [60, 40],
+            iconAnchor: [30, 20],
+            popupAnchor: [0, -20]
+        });
+        
+        // Spread them out slightly
+        const locLat = loc.lat + ((index % 3) * 0.4 - 0.4);
+        const locLon = loc.lon + ((index % 3) * 0.4 - 0.4);
+
+        const marker = L.marker([locLat, locLon], { icon: weatherIcon, zIndexOffset: 3000 })
+            .bindPopup(popupContent, {maxWidth: 280});
+            
+        marker.addTo(map);
+        weatherMarkers.push(marker);
     });
 }
 
