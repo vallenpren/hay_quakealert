@@ -581,22 +581,38 @@ function renderWeather() {
     clearWeather();
     if (!map || !cachedQuakeList) return;
 
-    let locations = cachedQuakeList.slice(0, 15).map(q => {
-        return {
-            lat: parseFloat(q.Coordinates.split(',')[0]),
-            lon: parseFloat(q.Coordinates.split(',')[1]),
-            name: q.Wilayah
-        };
-    });
-    
-    if(locations.length === 0) {
-        locations = [
-            {lat: -6.2088, lon: 106.8456, name: "Jakarta"},
-            {lat: -7.2504, lon: 112.7688, name: "Surabaya"},
-            {lat: -3.3167, lon: 114.5901, name: "Banjarmasin"},
-            {lat: 3.5952, lon: 98.6722, name: "Medan"}
-        ];
-    }
+    // Tampilkan 30+ kota di seluruh daerah Indonesia
+    let locations = [
+        { lat: 5.5483, lon: 95.3238, name: "Banda Aceh" },
+        { lat: 3.5952, lon: 98.6722, name: "Medan" },
+        { lat: -0.9471, lon: 100.3698, name: "Padang" },
+        { lat: 0.5071, lon: 101.4451, name: "Pekanbaru" },
+        { lat: -2.9909, lon: 104.7566, name: "Palembang" },
+        { lat: -5.4500, lon: 105.2667, name: "Bandar Lampung" },
+        { lat: -6.2088, lon: 106.8456, name: "Jakarta" },
+        { lat: -6.9175, lon: 107.6191, name: "Bandung" },
+        { lat: -6.9932, lon: 110.4203, name: "Semarang" },
+        { lat: -7.7956, lon: 110.3695, name: "Yogyakarta" },
+        { lat: -7.2504, lon: 112.7688, name: "Surabaya" },
+        { lat: -8.6705, lon: 115.2128, name: "Denpasar" },
+        { lat: -8.5833, lon: 116.1167, name: "Mataram" },
+        { lat: -10.1583, lon: 123.5833, name: "Kupang" },
+        { lat: -0.0263, lon: 109.3425, name: "Pontianak" },
+        { lat: -2.2083, lon: 113.9167, name: "Palangkaraya" },
+        { lat: -3.3167, lon: 114.5901, name: "Banjarmasin" },
+        { lat: -0.5022, lon: 117.1536, name: "Samarinda" },
+        { lat: 1.4822, lon: 124.8489, name: "Manado" },
+        { lat: -0.9000, lon: 119.8667, name: "Palu" },
+        { lat: -5.1477, lon: 119.4327, name: "Makassar" },
+        { lat: -3.9833, lon: 122.5833, name: "Kendari" },
+        { lat: 0.5333, lon: 123.0667, name: "Gorontalo" },
+        { lat: -3.6958, lon: 128.1814, name: "Ambon" },
+        { lat: 0.7833, lon: 127.3667, name: "Ternate" },
+        { lat: -2.5333, lon: 140.7167, name: "Jayapura" },
+        { lat: -0.8833, lon: 134.0833, name: "Manokwari" },
+        { lat: -8.4833, lon: 140.4000, name: "Merauke" },
+        { lat: -0.8667, lon: 131.2500, name: "Sorong" }
+    ];
     
     locations.forEach((loc, index) => {
         const types = ['hujan', 'cerah', 'badai', 'berawan'];
@@ -668,9 +684,9 @@ function renderWeather() {
             popupAnchor: [0, -20]
         });
         
-        // Spread them out slightly
-        const locLat = loc.lat + ((index % 3) * 0.4 - 0.4);
-        const locLon = loc.lon + ((index % 3) * 0.4 - 0.4);
+        // Tidak perlu penyebaran offset karena koordinat kota sudah tersebar luas
+        const locLat = loc.lat;
+        const locLon = loc.lon;
 
         const marker = L.marker([locLat, locLon], { icon: weatherIcon, zIndexOffset: 3000 })
             .bindPopup(popupContent, {maxWidth: 280});
