@@ -208,6 +208,16 @@
                                     </div>
                                     <div class="stat-label mt-1">Arah Evakuasi & Status</div>
                                 </div>
+
+                                <!-- AI Damage Predictor Panel -->
+                                <div class="stat-box mt" id="ai-prediction-panel" style="border: 1px solid var(--primary); background: rgba(15, 23, 42, 0.9);">
+                                    <div class="stat-label mb-1" style="color: var(--primary); display: flex; align-items: center; gap: 8px; justify-content: center; font-size: 0.8rem; margin-bottom: 10px;">
+                                        <i class="fa-solid fa-brain" style="font-size: 1.2rem;"></i> <span>AI Analitik Dampak</span>
+                                    </div>
+                                    <div id="ai-prediction-text" style="font-size: 0.85rem; color: var(--text-primary); text-align: left; line-height: 1.5; margin-top: 5px;">
+                                        <div style="text-align: center;"><i class="fa-solid fa-spinner fa-spin"></i> Menganalisis heuristik...</div>
+                                    </div>
+                                </div>
                             </div>
         
                             <!-- Recent Quakes List -->
@@ -255,6 +265,6 @@
     <!-- SheetJS (Excel Export) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Custom script -->
-    <script src="script.js?v=2.0.1"></script>
+    <script src="script.js?v=2.0.5"></script>
 </body>
 </html>

@@ -313,6 +313,48 @@ function updateDashboard(latest, recentList) {
     // Render count
     quakeCountEl.innerText = recentList.length;
 
+    // AI Heuristic Prediction Rendering
+    const aiPredictionTextEl = document.getElementById('ai-prediction-text');
+    if (aiPredictionTextEl) {
+        let depth = parseInt(latest.Kedalaman.replace(/\D/g,'')) || 10;
+        let aiText = `<ul style="padding-left:15px; margin: 0; padding-bottom: 10px; color: var(--text-primary);">`;
+        
+        // Impact Analysis
+        if (magLatest >= 7.0 && depth <= 60) {
+            aiText += `<li style="margin-bottom: 8px;"><span class="text-danger" style="font-weight:bold;">🔥 Krisis Mayor:</span> Sangat destruktif. Resiko tinggi bangunan beton hancur dan jalanan retak di area episentrum (${latest.Wilayah}).</li>`;
+            aiText += `<li style="margin-bottom: 8px;"><span class="text-warning" style="font-weight:bold;">⚠️ Geologi:</span> Waspada likuifaksi atau tanah longsor skala besar pada daerah berlereng.</li>`;
+        } else if (magLatest >= 6.0 && depth <= 60) {
+            aiText += `<li style="margin-bottom: 8px;"><span class="text-warning" style="font-weight:bold;">⚠️ Kerusakan Berat:</span> Dinding retak/ambruk pada struktur bangunan non-permanen. Kepanikan masal terprediksi.</li>`;
+        } else if (magLatest >= 5.0) {
+            aiText += `<li style="margin-bottom: 8px;"><span style="color: var(--warning); font-weight:bold;">⚡ Kerusakan Ringan:</span> Barang gantung berjatuhan, retak halus pada dinding. Orang akan terbangun mendadak.</li>`;
+        } else {
+            aiText += `<li style="margin-bottom: 8px;"><span style="color: var(--success); font-weight:bold;">✅ Skala Mikro:</span> Hanya terasa guncangan atau getaran kecil. Kerusakan struktur bangunan terprediksi 0%.</li>`;
+        }
+        
+        // Depth Analysis
+        if (depth > 100) {
+            aiText += `<li style="margin-bottom: 8px;"><span style="color: #a78bfa; font-weight:bold;">🌊 Spektrum Luas:</span> Pusat sangat dalam (${depth} km). Getaran terasa ringan secara teritorial yang amat luas, kerusakan permukaan teredam.</li>`;
+        } else {
+            aiText += `<li style="margin-bottom: 8px;"><span class="text-danger" style="font-weight:bold;">💥 Tremor Berbahaya:</span> Pusat sangat dangkal (${depth} km). Daya hancur permukaan meningkat tajam secara terpusat!</li>`;
+        }
+        aiText += `</ul>`;
+        
+        // Personal Threat Logic
+        if (distanceToUser !== null) {
+            if (distanceToUser < 100 && magLatest >= 6.0) {
+                aiText += `<div style="padding:10px; background:rgba(239, 68, 68, 0.2); border-radius:8px; border-left: 4px solid var(--danger);"><strong>TINDAKAN ANDA:</strong> Berlindung SEKARANG! Jauhi kaca & lemari. Tunggu tanah kembali stabil lalu evakuasi lapangan.</div>`;
+            } else if (distanceToUser < 200 && magLatest >= 5.0) {
+                aiText += `<div style="padding:10px; background:rgba(245, 158, 11, 0.2); border-radius:8px; border-left: 4px solid var(--warning);"><strong>TINDAKAN ANDA:</strong> Waspada penuh. Siapkan tas P3K dan stand-by memantau potensi retakan/gempa susulan.</div>`;
+            } else {
+                aiText += `<div style="padding:10px; background:rgba(16, 185, 129, 0.2); border-radius:8px; border-left: 4px solid var(--success);"><strong>TINDAKAN ANDA:</strong> Jarak aman. Area Anda diklasifikasikan relatif bebas dari radius bahaya gempa ini. Pertahankan ketenangan.</div>`;
+            }
+        } else {
+            aiText += `<div style="padding:10px; background:rgba(255, 255, 255, 0.1); border-radius:8px; border-left: 4px solid var(--text-secondary);">Aktifkan Izin Lokasi GPS untuk mendapatkan rekomendasi evakuasi personal AI.</div>`;
+        }
+        
+        aiPredictionTextEl.innerHTML = aiText;
+    }
+
     // Render recent quakes list
     quakeListEl.innerHTML = '';
     recentList.forEach(q => {
